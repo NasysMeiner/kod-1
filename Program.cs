@@ -14,9 +14,6 @@ namespace hw2._2
             string message = "";
             string stop = "exit";
 
-            //Console.WriteLine("Вы хотите продолжить закачку файла?");
-            //message = Console.ReadLine();
-
             while (message != stop)
             {
                 Console.WriteLine("Вы хотите продолжить закачку файла?");
