@@ -14,7 +14,6 @@ namespace hw2._11
             int depth = 0;
             int depthMax = 0;
             int correctness = 0;
-            int halfSymbol = 2;
 
             symbol = Console.ReadLine();
 
