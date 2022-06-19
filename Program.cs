@@ -11,7 +11,7 @@ namespace hw3._6
         static void Main(string[] args)
         {
             int[] array = { 10, 9, 8, 4, 6, 7, 5, 2, 1, 3 };
-            int a = 0;
+            int intermediate = 0;
 
             for (int i = 0; i < array.Length; i++)
             {
@@ -26,10 +26,10 @@ namespace hw3._6
                 {
                     if (array[i] < array[j])
                     {
-                        a = array[j];
+                        intermediate = array[j];
                         int b = array[i];
                         array[j] = array[i];
-                        array[i] = a;
+                        array[i] = intermediate;
                     }
                 }
             }
