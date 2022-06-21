@@ -21,7 +21,7 @@ namespace hw4._2
             Console.ReadLine();
         }
 
-        static void Bar(int protsent, int maxValue, int positionY = 0, ConsoleColor color = ConsoleColor.DarkRed, char symbol = ' ')
+        static void AddBar(int protsent, int maxValue, int positionY = 0, ConsoleColor color = ConsoleColor.DarkRed, char symbol = ' ')
         {
             int value = (maxValue / 100) * protsent;
 
