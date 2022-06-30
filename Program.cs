@@ -4,192 +4,192 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace hw6._3
+namespace hw6._6
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            DataBase dataBase = new DataBase();
-            dataBase.ToWork(dataBase);
-        }
-    }
-
-    class DataBase
-    {
-        private int _numberId = 0;
-        private List<Player> _players = new List<Player>();
-
-        public void ToWork(DataBase dataBase)
-        {
+            Salesman salesman = new Salesman(0);
+            Player player = new Player(100000);
+            Console.CursorVisible = false;
             bool isWork = true;
+            int variable = 1;
             string userInput;
 
-            while(isWork)
+            while (isWork)
             {
-                Console.SetCursorPosition(0, 20);
-                dataBase.ShowInfo();
-
+                Console.SetCursorPosition(0, 25);
+                Console.WriteLine($"Денег:{player.Money}.");
                 Console.SetCursorPosition(0, 0);
-                Console.WriteLine("Меню");
-                Console.WriteLine("\n1 - Добавить игрока.\n2 - найти игрока по Id.\n3 - удалить игрока\n4 - забанить игрока.\n5 - разбанить игрока.\n6 - выход");
+                Console.WriteLine("Меню магазина:");
+                Console.WriteLine("\n1 - показать весь товар.\n2 - купить товар.\n3 - посмотреть свой инвентарь.\n4 - выйти из магазина.\n");
                 userInput = Console.ReadLine();
 
-                switch(userInput)
+                switch (userInput)
                 {
                     case "1":
-                        CreatePlayer();
+                        salesman.ShowAllProduct();
                         break;
                     case "2":
-                        SearchId();
-                        Console.ReadKey();
-                        Console.Clear();
+                        player.BuyOperation(salesman, player);
                         break;
                     case "3":
-                        DeletePlayer();
+                        player.ShowAllProduct();
                         break;
                     case "4":
-                        Ban();
-                        break;
-                    case "5":
-                        UnBan();
-                        break;
-                    case "6":
                         isWork = false;
                         break;
-
                 }
             }
         }
+    }
 
-        private void CreatePlayer()
+    class Human
+    {
+        private protected List<Product> Inventory = new List<Product>();
+        public int Money { get; private set; }
+
+        public Human(int money)
         {
-            Random random = new Random();
-
-            string userInput;
-            
-            Console.Write("Введите имя игрока:");           
-            userInput = Console.ReadLine();
-            _players.Add(new Player(userInput, random));
-            _players[_players.Count - 1].ShowStats();
-            Console.ReadLine();
-            Console.Clear();           
+            Money = money;
         }
 
-        private void ShowInfo()
+        public void ShowAllProduct()
         {
-            int number = 0;
-
-            foreach (Player player in _players)
+            if(Inventory.Count > 0)
             {
-                Console.Write(number + " ");
-                player.ShowStats();
-                number++;
+                foreach (Product subject in Inventory)
+                {
+                    Console.WriteLine($"Товар под ID:{subject.Id} имеет название: {subject.Name} и стоит:{subject.Price}.");
+                }
             }
-        }
+            else
+            {
+                Console.WriteLine("Пусто.");
+            }
 
-        private void DeletePlayer()
-        {
-            SearchId();
-            Console.WriteLine($"ID {_players[_numberId].Id} удалён.");
-            _players.RemoveAt(_numberId);
             Console.ReadLine();
             Console.Clear();
         }
 
-        private void Ban()
+        private protected void TransferMoney(Salesman salesman, Player player, List<Product> inventory)
         {
-            SearchId();
-            _players[_numberId].Ban();    
-            Console.ReadKey();
-            Console.Clear();
+            int price = inventory[inventory.Count - 1].Price;
+            player.Money -= price;
+            salesman.Money += price;
         }
 
-        private void UnBan()
+        private protected Product DeleteProduct(Salesman salesman, int productId)
         {
-            SearchId();
-            _players[_numberId].UnBan();   
-            Console.ReadKey();
-            Console.Clear();
+            Product product;
+            product = salesman.Inventory[productId];
+            salesman.Inventory.RemoveAt(productId);
+            return product;
         }
+    }
 
-        private void SearchId()
+    class Player : Human
+    {
+        public Player (int money) : base(money) { }
+
+        public void BuyOperation(Salesman salesman, Player player)
         {
-            int intermediate = 0;           
-            int playerId;
             string userInput;
+            int idProduct;
 
-            Console.Write("Введите id игрока:");
+            Console.Write("Введите Id товара, которое хотите приобрести.");
             userInput = Console.ReadLine();
 
             if (int.TryParse(userInput, out int result))
             {
-                foreach (Player player in _players)
+                idProduct = salesman.SerachIdProduct(result);
+
+                if (idProduct >= 0)
                 {
-                    playerId = player.Id;
-
-                    if(playerId == result)
-                    {
-                        _numberId = intermediate;
-                        break;
+                    if (salesman.ExaminationPrice(player, idProduct))
+                    {  
+                        Inventory.Add(player.DeleteProduct(salesman, idProduct));
+                        TransferMoney(salesman, player, Inventory);
+                        Console.WriteLine("Товар куплен.");
+                        Console.ReadLine();
+                        Console.Clear();
                     }
-
-                    intermediate++;
+                    else
+                    {
+                        Console.WriteLine("Недостаточно средств.");
+                        Console.ReadLine();
+                        Console.Clear();
+                    }
                 }
-
-                _players[_numberId].ShowStats();
+                else
+                {
+                    Console.WriteLine("Такого товара нет.");
+                    Console.ReadLine();
+                    Console.Clear();
+                }
             }
             else
             {
-                Console.WriteLine("Некорректный ввод");
+                Console.WriteLine("Некорректный ввод.");
                 Console.ReadLine();
+                Console.Clear();
             }
         }
     }
 
-    class Player
+    class Salesman : Human
     {
-        private static int _ids;
-        private string _name;
-        private int _level;
-        private bool _banStatus;
-
-        public Player(string name, Random random)
+        public Salesman(int money) : base(money)
         {
-            int maxLevel = 100;
-            int minLevel = 1;
-            Id = ++_ids;
-            _name = name;
-            _level = random.Next(minLevel, maxLevel);
-            _banStatus = false;
+            Inventory.Add(new Product("Яблоко", 100));
+            Inventory.Add(new Product("Груша", 90));
+            Inventory.Add(new Product("Виноград", 150));
+            Inventory.Add(new Product("Арбуз", 300));
+            Inventory.Add(new Product("Топор", 1100));
+            Inventory.Add(new Product("Меч", 1000));
+            Inventory.Add(new Product("Зелье", 40));
+            Inventory.Add(new Product("Сапоги", 500));
+            Inventory.Add(new Product("Лопата", 100000));
         }
+
+        public int SerachIdProduct(int userInput)
+        {
+            int intermediateId = 0;
+            int idProduct = -1;
+
+            foreach (var product in Inventory)
+            {
+                if (product.Id == userInput)
+                {
+                    idProduct = intermediateId;
+                }
+
+                intermediateId++;
+            }
+
+            return idProduct;
+        }
+
+        public bool ExaminationPrice(Player player, int productId)
+        {
+            return Inventory[productId].Price <= player.Money;
+        }
+    }
+
+    class Product
+    {
+        private static int _ids = 100;
 
         public int Id { get; private set; }
+        public string Name { get; private set; }
+        public int Price{ get; private set; }
 
-        public void ShowStats()
+        public Product(string name, int price)
         {
-            string intermediate;
-
-            if (_banStatus)
-            {
-                intermediate = "забанен";
-            }
-            else
-            {
-                intermediate = "не забанен";
-            }
-
-            Console.WriteLine($"Игрок: {_name} имеет id:{Id} level: {_level} Состояние на сервере: {intermediate}");
-        }
-
-        public void Ban()
-        {
-            _banStatus = true;
-        }
-
-        public void UnBan()
-        {
-            _banStatus = false;
+            Name = name;
+            Price = price;
+            Id = ++_ids;
         }
     }
 }
