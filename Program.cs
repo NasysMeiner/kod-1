@@ -73,14 +73,6 @@ namespace hw6._6
             Console.Clear();
         }
 
-        private protected Product DeleteProduct(Salesman salesman, int productId)
-        {
-            Product product;
-            product = salesman.Inventory[productId];
-            salesman.Inventory.RemoveAt(productId);
-            return product;
-        }
-
         private protected void ChangeMoney(int price)
         {
             Money -= price;
