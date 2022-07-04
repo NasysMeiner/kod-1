@@ -4,89 +4,63 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace hw7._4
+namespace hw7._5
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.CursorVisible = false;
-            Database database = new Database();
-            database.Work();
+            Box box = new Box();
+            box.Work();
         }
     }
 
-    class Database
+    class Box
     {
-        private List<Player> _players = new List<Player>();
-        private List<Player> _playersTopStrenght = new List<Player>();
+        private List<Product> _products = new List<Product>();
+        private static int _years = 2000;
 
-        public Database()
+        public Box()
         {
-            _players.Add(new Player("Oleg", 100000, 500));
-            _players.Add(new Player("Андрей", 5000, 50));
-            _players.Add(new Player("Эдик", 100, 3000));
-            _players.Add(new Player("Владик", 298, 80));
-            _players.Add(new Player("Nikita", 7256, 5000));
-            _players.Add(new Player("Ilya", 1753, 268));
-            _players.Add(new Player("Valeriy", 234556, 1000));
-            _players.Add(new Player("Юрий", 4562, 347));
-            _players.Add(new Player("Паша", 35678, 400));
-            _players.Add(new Player("Олег", 753, 100000));
+            _products.Add(new Product("Тушенка1", 15, 1989));
+            _products.Add(new Product("Тушенка2", 15, 1995));
+            _products.Add(new Product("Тушенка3", 15, 2000));
+            _products.Add(new Product("Тушенка4", 15, 1976));
+            _products.Add(new Product("Тушенка5", 15, 1958));
+            _products.Add(new Product("Тушенка6", 15, 1989));
+            _products.Add(new Product("Тушенка7", 15, 1970));
+            _products.Add(new Product("Тушенка8", 15, 1990));
+            _products.Add(new Product("Тушенка9", 15, 1991));
         }
 
         public void Work()
         {
-            SortPlayerStrenght();
-            SortPlayerLevel();
+            FindDelay();
             Console.ReadLine();
         }
 
-        private void SortPlayerStrenght()
+        private void FindDelay()
         {
-            int topPlayerStrenght = 3;
+            var delay = _products.Where(product => (_years - product.ManufactureDate) >= product.ExpirationDate);
 
-            var sortPlayers = _players.OrderByDescending(player => player.Strength).Take(topPlayerStrenght);
-
-            Console.WriteLine("\nТоп 3 игрока по силе:\n");
-
-            foreach(var player in sortPlayers)
+            foreach(var product in delay)
             {
-                Console.WriteLine($"{player.Name} - {player.Strength} силы и {player.Level} лвл.");
-            }
-        }
-
-        private void SortPlayerLevel()
-        {
-            int topPlayerLevel = 3;
-            int positionY = 3;
-
-            var sortPlayers = _players.OrderByDescending(player => player.Level).Take(topPlayerLevel);
-
-            Console.SetCursorPosition(80, 1);
-
-            Console.WriteLine("Топ 3 игрока по лвл:\n");
-
-            foreach (var player in sortPlayers)
-            {
-                Console.SetCursorPosition(80, positionY);
-                Console.WriteLine($"{player.Name} - {player.Level} лвл и {player.Strength} силы.");
-                positionY++;
+                Console.WriteLine($"Просрочена: {product.Name}.");
             }
         }
     }
 
-    class Player
+    class Product
     {
         public string Name { get; private set; }
-        public int Strength { get; private set; }
-        public int Level { get; private set; }
+        public int ExpirationDate { get; private set; }
+        public int ManufactureDate { get; private set; }
 
-        public Player(string name, int strenght, int level)
+        public Product(string name, int expirationDate, int manufactureDate)
         {
             Name = name;
-            Strength = strenght;
-            Level = level;
+            ExpirationDate = expirationDate;
+            ManufactureDate = manufactureDate;
         }
     }
 }
